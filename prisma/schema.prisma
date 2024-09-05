@@ -14,21 +14,23 @@ datasource db {
 }
 
 model User {
-  id          Int        @id @default(autoincrement())
-  email       String     @unique
-  first_name  String     @db.Char(50)
-  last_name   String     @db.Char(50)
-  address     String     @db.Char(200)
-  city        String     @db.Char(15)
-  state       String     @db.Char(2)
-  postalCode  String     @db.Char(5)
-  dateOfBirth String     @db.Char(10)
-  ssn         String     @db.Char(4)
-  password    String
-  phoneNumber String     @unique @db.Char(10)
-  created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
-  accounts    Accounts[]
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  first_name     String         @db.Char(50)
+  last_name      String         @db.Char(50)
+  address        String         @db.Char(200)
+  city           String         @db.Char(15)
+  state          String         @db.Char(2)
+  postalCode     String         @db.Char(5)
+  dateOfBirth    String         @db.Char(10)
+  ssn            String         @db.Char(4)
+  password       String
+  phoneNumber    String         @unique @db.Char(10)
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+  accounts       Accounts[]
+  funds_sent     Transactions[] @relation("SourceUser")
+  funds_received Transactions[] @relation("DestinationUser")
 }
 
 model Accounts {
@@ -50,10 +52,14 @@ model Accounts {
 }
 
 model Transactions {
-  id          Int      @id @default(autoincrement())
-  transfer_id String   @unique
-  amount      Int
-  description String   @db.Char(100)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id                  Int      @id @default(autoincrement())
+  transfer_id         String   @unique
+  amount              Int
+  description         String   @db.Char(100)
+  source_user         User     @relation("SourceUser", fields: [source_user_id], references: [id])
+  destination_user    User     @relation("DestinationUser", fields: [destination_user_id], references: [id])
+  source_user_id      Int
+  destination_user_id Int
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
 }

@@ -63,7 +63,9 @@ export const POST = async (req: NextRequest) => {
         },
       });
 
-      if ((senderAccount?.available_balance as number) < amount) {
+      if (senderAccount.funding_sourceId != sourceAccountId) {
+        return errorHelper("Your funding source id is invalid", 409);
+      } else if ((senderAccount?.available_balance as number) < amount) {
         return errorHelper("Insufficient Balance", 409);
       }
 
@@ -85,6 +87,8 @@ export const POST = async (req: NextRequest) => {
             ?.split("/")[4] as string,
           amount: Number(amount),
           description: description,
+          source_user_id: senderAccount.user_id,
+          destination_user_id: receiverAccount.user_id,
         },
       });
 
