@@ -9,7 +9,7 @@ import {
   transactionDetails,
   userBalanceDetails,
 } from "@/lib/userActions/bankActions/bankActions";
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useToast } from "../ui/use-toast";
 
 export default function Home() {
@@ -61,6 +61,10 @@ export default function Home() {
     getTransactionsData();
   }, []);
 
+  const totalTransactionValue = useMemo(() => {
+    return transactionData?.reduce((acc, crr) => acc + crr.amount, 0);
+  }, [transactionData]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100">
       <main className="container mx-auto p-8">
@@ -91,7 +95,7 @@ export default function Home() {
               <ArrowUpDown className="h-6 w-6 opacity-75" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">$6,500</div>
+              <div className="text-3xl font-bold">${totalTransactionValue}</div>
               <p className="text-xs opacity-75">65% of total balance</p>
             </CardContent>
           </Card>

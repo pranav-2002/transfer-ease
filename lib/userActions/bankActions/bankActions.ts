@@ -2,8 +2,8 @@
 
 import prisma from "@/db";
 import { authOptions } from "@/lib/auth";
+import { dwollaClient } from "@/lib/dwolla";
 import { getServerSession } from "next-auth";
-import { date } from "zod";
 
 export const userAccountDetails = async () => {
   const session = await getServerSession(authOptions);
@@ -125,6 +125,56 @@ export const transactionDetails = async () => {
     return {
       status: "Error",
       message: "Failed to retrieve account balance",
+    };
+  }
+};
+
+export const dwollaTransactionDetails = async () => {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return {
+      status: "Error",
+      message: "No active session found",
+    };
+  }
+
+  try {
+    const userAccount = await prisma.accounts.findMany({
+      where: {
+        user_id: session.user.id,
+      },
+      select: {
+        customer_id: true,
+      },
+    });
+
+    if (userAccount.length === 0) {
+      return {
+        status: "Error",
+        message: "No accounts linked to the user",
+      };
+    }
+
+    // Fetch Dwolla Transactions
+    const customerId = userAccount[0].customer_id;
+    const transactions = await dwollaClient.get(
+      `customers/${customerId}/transfers`
+    );
+
+    return {
+      status: "Success",
+      message: "Fetched all transactions",
+      data: {
+        transactions: transactions.body._embedded.transfers,
+        totalCount: transactions.body.total,
+      },
+    };
+  } catch (error) {
+    console.log("Failed to fetch Dwolla Transactions", error);
+    return {
+      status: "Error",
+      message: "Failed to retrieve Dwolla transactions",
     };
   }
 };

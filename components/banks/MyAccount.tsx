@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Copy, Check, CreditCard } from "lucide-react";
 import { userAccountDetails } from "@/lib/userActions/bankActions/bankActions";
 import { useToast } from "../ui/use-toast";
-import { useSession } from "next-auth/react";
 
 export default function MyAccount() {
   const { toast } = useToast();
@@ -59,8 +58,6 @@ export default function MyAccount() {
   useEffect(() => {
     getAccountData();
   }, []);
-
-  console.log(accountInfo);
 
   return (
     <div className="container mx-auto p-4 space-y-6">

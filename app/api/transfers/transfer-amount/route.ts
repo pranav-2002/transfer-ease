@@ -80,6 +80,10 @@ export const POST = async (req: NextRequest) => {
         },
       });
 
+      if (!receiverAccount) {
+        return errorHelper("Receiver account does not exist", 409);
+      }
+
       const transaction = await tx.transactions.create({
         data: {
           transfer_id: response.headers
