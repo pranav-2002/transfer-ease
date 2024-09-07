@@ -56,13 +56,11 @@ const PlaidLink = () => {
         setLoading(true);
         try {
           const response = await createExchangeToken(public_token, user);
-          if (response) {
-            toast({
-              title: "Account linked successfully",
-            });
-            setLoading(false);
-            router.push("/my-account");
-          }
+          toast({
+            title: "Account linked successfully",
+          });
+          setLoading(false);
+          router.push("/my-account");
         } catch (error) {
           console.log(error);
           setLoading(false);

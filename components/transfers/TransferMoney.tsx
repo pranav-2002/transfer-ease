@@ -13,14 +13,12 @@ export default function TransferMoney() {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     amount: "",
-    customerId: "",
     sourceFundingSourceId: "",
     destinationFundingSourceId: "",
     note: "",
   });
   const [errors, setErrors] = useState({
     amount: "",
-    customerId: "",
     sourceFundingSourceId: "",
     destinationFundingSourceId: "",
   });
@@ -40,7 +38,6 @@ export default function TransferMoney() {
     let isValid = true;
     const newErrors = {
       amount: "",
-      customerId: "",
       sourceFundingSourceId: "",
       destinationFundingSourceId: "",
     };
@@ -51,10 +48,6 @@ export default function TransferMoney() {
       parseFloat(formData.amount) <= 0
     ) {
       newErrors.amount = "Please enter a valid amount greater than 0.";
-      isValid = false;
-    }
-    if (!formData.customerId) {
-      newErrors.customerId = "Customer ID is required.";
       isValid = false;
     }
     if (!formData.sourceFundingSourceId) {
@@ -82,7 +75,6 @@ export default function TransferMoney() {
           amount: formData.amount,
           sourceAccountId: formData.sourceFundingSourceId,
           destinationAccountId: formData.destinationFundingSourceId,
-          customerId: formData.customerId,
           description: formData.note,
         };
         const response = await axios.post(
@@ -98,7 +90,6 @@ export default function TransferMoney() {
         setIsLoading(false);
         setFormData({
           amount: "",
-          customerId: "",
           sourceFundingSourceId: "",
           destinationFundingSourceId: "",
           note: "",
@@ -147,34 +138,6 @@ export default function TransferMoney() {
                 </div>
                 {errors.amount && (
                   <p className="mt-2 text-sm text-red-600">{errors.amount}</p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="customerId"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Customer ID
-                </label>
-                <div className="mt-1 relative rounded-md shadow-sm">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <Input
-                    type="text"
-                    name="customerId"
-                    id="customerId"
-                    className="pl-10"
-                    placeholder="Enter yours or recipient's Customer ID"
-                    value={formData.customerId}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                {errors.customerId && (
-                  <p className="mt-2 text-sm text-red-600">
-                    {errors.customerId}
-                  </p>
                 )}
               </div>
 

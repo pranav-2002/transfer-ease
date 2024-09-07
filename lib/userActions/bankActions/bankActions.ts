@@ -167,7 +167,7 @@ export const dwollaTransactionDetails = async () => {
       message: "Fetched all transactions",
       data: {
         transactions: transactions.body._embedded.transfers,
-        totalCount: transactions.body.total,
+        userCustomerId: customerId,
       },
     };
   } catch (error) {

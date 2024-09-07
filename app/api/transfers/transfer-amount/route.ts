@@ -7,13 +7,7 @@ import { errorHelper } from "../../helpers/errorHelpers";
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
 
-  const {
-    sourceAccountId,
-    destinationAccountId,
-    amount,
-    customerId,
-    description,
-  } = body;
+  const { sourceAccountId, destinationAccountId, amount, description } = body;
 
   const requestBody = {
     _links: {
@@ -28,19 +22,6 @@ export const POST = async (req: NextRequest) => {
       currency: "USD",
       value: amount,
     },
-    fees: [
-      {
-        _links: {
-          "charge-to": {
-            href: `https://api-sandbox.dwolla.com/customers/${customerId}`,
-          },
-        },
-        amount: {
-          value: "0.1",
-          currency: "USD",
-        },
-      },
-    ],
   };
 
   // Reference variable in case of error

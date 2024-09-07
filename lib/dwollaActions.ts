@@ -8,7 +8,7 @@ export const createDwollaCustomer = async (user: any) => {
     lastName: user.last_name.trim(),
     email: user.email,
     type: "personal",
-    address1: user.address,
+    address1: user.address.trim(),
     city: user.city,
     state: user.state,
     postalCode: user.postalCode,
