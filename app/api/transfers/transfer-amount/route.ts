@@ -3,9 +3,21 @@ import { dwollaClient } from "@/lib/dwolla";
 import { NextRequest, NextResponse } from "next/server";
 import { successHelper } from "../../helpers/successHelper";
 import { errorHelper } from "../../helpers/errorHelpers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const POST = async (req: NextRequest) => {
+  const session = await getServerSession(authOptions);
   const body = await req.json();
+
+  if (!session) {
+    return NextResponse.json(
+      {
+        message: "Unauthorized",
+      },
+      { status: 403 }
+    );
+  }
 
   const { sourceAccountId, destinationAccountId, amount, description } = body;
 
@@ -44,7 +56,7 @@ export const POST = async (req: NextRequest) => {
         },
       });
 
-      if (senderAccount.funding_sourceId != sourceAccountId) {
+      if (!senderAccount || senderAccount.funding_sourceId != sourceAccountId) {
         return errorHelper("Your funding source id is invalid", 409);
       } else if ((senderAccount?.available_balance as number) < amount) {
         return errorHelper("Insufficient Balance", 409);
