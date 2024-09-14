@@ -60,13 +60,13 @@ export const columns: ColumnDef<any>[] = [
     header: ({ column }) => {
       return (
         <div
-          // onClick={() => {
-          //   column.toggleSorting(column.getIsSorted() === "asc");
-          // }}
+          onClick={() => {
+            column.toggleSorting(column.getIsSorted() === "asc");
+          }}
           className="flex items-center"
         >
           Amount
-          {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+          <ArrowUpDown className="ml-2 h-4 w-4" />
         </div>
       );
     },
@@ -115,7 +115,7 @@ export const columns: ColumnDef<any>[] = [
     id: "actions",
     accessorKey: "_links",
     header: "Details",
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const [isOpen, setIsOpen] = useState(false);
 
       type viewMoreData = {
