@@ -4,6 +4,7 @@ import prisma from "@/db";
 import { authOptions } from "@/lib/auth";
 import { dwollaClient } from "@/lib/dwolla";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
 export const userAccountDetails = async () => {
   const session = await getServerSession(authOptions);
@@ -52,10 +53,7 @@ export const userBalanceDetails = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
-    return {
-      status: "Error",
-      message: "No active session found",
-    };
+    redirect("/auth/login");
   }
 
   try {
@@ -175,6 +173,21 @@ export const dwollaTransactionDetails = async () => {
     return {
       status: "Error",
       message: "Failed to retrieve Dwolla transactions",
+    };
+  }
+};
+
+// Get Dwolla customer information
+export const getDwollaCustomerInformation = async (customerId: string) => {
+  try {
+    const response = await dwollaClient.get(`customers/${customerId}`);
+    return {
+      data: response.body.firstName + " " + response.body.lastName,
+    };
+  } catch (error) {
+    console.log("Failed to fetch Dwolla Customer", error);
+    return {
+      data: "Error",
     };
   }
 };

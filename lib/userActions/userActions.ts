@@ -46,3 +46,26 @@ export const userSignUp = async (userData: object) => {
     };
   }
 };
+
+// Get user by params
+// export const getUserDetailsFromAccount = async (fundingSourceId: string) => {
+//   try {
+//     const userDetails = await prisma.accounts.findUnique({
+//       where: {
+//         funding_sourceId: fundingSourceId,
+//       },
+//       select: {
+//         user: {
+//           select: {
+//             first_name: true,
+//             last_name: true,
+//           },
+//         },
+//       },
+//     });
+//     return userDetails?.user.first_name + " " + userDetails?.user.last_name;
+//   } catch (error) {
+//     console.log(error);
+//     return "Error";
+//   }
+// };
