@@ -63,7 +63,7 @@ export const columns: ColumnDef<any>[] = [
           onClick={() => {
             column.toggleSorting(column.getIsSorted() === "asc");
           }}
-          className="flex items-center"
+          className="flex items-center cursor-pointer"
         >
           Amount
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -78,6 +78,11 @@ export const columns: ColumnDef<any>[] = [
         currency: "USD",
       }).format(amount);
       return formatted;
+    },
+    sortingFn: (a: any, b: any) => {
+      const amountA = parseFloat(a.getValue("amount").value);
+      const amountB = parseFloat(b.getValue("amount").value);
+      return amountA - amountB;
     },
   },
   {
