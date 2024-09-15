@@ -84,10 +84,26 @@ export const columns: ColumnDef<any>[] = [
       const amountB = parseFloat(b.getValue("amount").value);
       return amountA - amountB;
     },
+    filterFn: (row, columnId, filterValue) => {
+      const amount: any = row.getValue(columnId);
+      return parseFloat(amount.value) === parseFloat(filterValue);
+    },
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: ({ column }) => {
+      return (
+        <div
+          onClick={() => {
+            column.toggleSorting(column.getIsSorted() === "asc");
+          }}
+          className="flex items-center cursor-pointer"
+        >
+          Status
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </div>
+      );
+    },
     cell: ({ row }) => {
       return (
         <span
@@ -106,7 +122,19 @@ export const columns: ColumnDef<any>[] = [
   },
   {
     accessorKey: "created",
-    header: "Date",
+    header: ({ column }) => {
+      return (
+        <div
+          onClick={() => {
+            column.toggleSorting(column.getIsSorted() === "asc");
+          }}
+          className="flex items-center cursor-pointer"
+        >
+          Date
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </div>
+      );
+    },
     cell: ({ row }) => {
       const date = new Date(row.getValue("created"));
       return date.toLocaleString();

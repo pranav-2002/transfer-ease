@@ -9,6 +9,8 @@ import {
   getCoreRowModel,
   useReactTable,
   getPaginationRowModel,
+  getFilteredRowModel,
+  ColumnFiltersState,
   SortingState,
   getSortedRowModel,
 } from "@tanstack/react-table";
@@ -21,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -33,7 +36,11 @@ export default function DataTable<TData, TValue>({
   data,
   userCustomerId,
 }: DataTableProps<TData, TValue>) {
+  // States
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
 
   const table = useReactTable({
     data,
@@ -42,12 +49,33 @@ export default function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
+      columnFilters,
     },
   });
   return (
     <div>
+      <div className="flex items-center justify-between py-4">
+        <Input
+          placeholder="Search Transaction ID..."
+          value={(table.getColumn("id")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("id")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+        <Input
+          placeholder="Search Amount..."
+          value={(table.getColumn("amount")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("amount")?.setFilterValue(event.target.value)
+          }
+          className="w-40"
+        />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
