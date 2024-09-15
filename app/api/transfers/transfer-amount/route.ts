@@ -8,17 +8,12 @@ import { authOptions } from "@/lib/auth";
 
 export const POST = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
-  const body = await req.json();
 
   if (!session) {
-    return NextResponse.json(
-      {
-        message: "Unauthorized",
-      },
-      { status: 403 }
-    );
+    return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
   }
 
+  const body = await req.json();
   const { sourceAccountId, destinationAccountId, amount, description } = body;
 
   const requestBody = {
@@ -36,16 +31,31 @@ export const POST = async (req: NextRequest) => {
     },
   };
 
-  // Reference variable in case of error
   let transactionId = "";
 
   try {
-    // Making a dwolla transaction
+    // Making the Dwolla transaction
     const response = await dwollaClient.post("transfers", requestBody);
+    transactionId = response.headers.get("location")?.split("/")[4] as string;
 
-    // Making the DB transaction
-    prisma.$transaction(async (tx) => {
-      const senderAccount = await tx.accounts.update({
+    // Perform database transaction
+    await prisma.$transaction(async (tx) => {
+      // Fetch sender's account with balance check
+      const senderAccount = await tx.accounts.findUnique({
+        where: {
+          funding_sourceId: sourceAccountId,
+        },
+      });
+
+      if (!senderAccount) {
+        return errorHelper("Your funding source ID is invalid", 409);
+      }
+      if (senderAccount.available_balance < amount) {
+        return errorHelper("Insufficient Balance", 409);
+      }
+
+      // Decrement sender's balance
+      await tx.accounts.update({
         data: {
           available_balance: {
             decrement: Number(amount),
@@ -56,12 +66,7 @@ export const POST = async (req: NextRequest) => {
         },
       });
 
-      if (!senderAccount || senderAccount.funding_sourceId != sourceAccountId) {
-        return errorHelper("Your funding source id is invalid", 409);
-      } else if ((senderAccount?.available_balance as number) < amount) {
-        return errorHelper("Insufficient Balance", 409);
-      }
-
+      // Fetch and update the receiver's account
       const receiverAccount = await tx.accounts.update({
         data: {
           available_balance: {
@@ -74,27 +79,34 @@ export const POST = async (req: NextRequest) => {
       });
 
       if (!receiverAccount) {
-        return errorHelper("Receiver account does not exist", 409);
+        return errorHelper("Receiver account does not exist", 402);
       }
 
-      const transaction = await tx.transactions.create({
+      // Create transaction record
+      await tx.transactions.create({
         data: {
-          transfer_id: response.headers
-            .get("location")
-            ?.split("/")[4] as string,
+          transfer_id: transactionId,
           amount: Number(amount),
-          description: description,
+          description,
           source_user_id: senderAccount.user_id,
           destination_user_id: receiverAccount.user_id,
         },
       });
-
-      transactionId = response.headers.get("location")?.split("/")[4] as string;
     });
+
     return successHelper(`${amount} successfully transferred to user`, 200);
   } catch (error) {
-    console.log(error);
-    dwollaClient.post(`/transfers/${transactionId}`, { status: "cancelled" });
+    console.error(error);
+    // Cancel Dwolla transfer if transaction failed
+    if (transactionId) {
+      try {
+        await dwollaClient.post(`/transfers/${transactionId}`, {
+          status: "cancelled",
+        });
+      } catch (error) {
+        console.error("Failed to cancel Dwolla transaction", error);
+      }
+    }
     return errorHelper(error, 500);
   }
 };
