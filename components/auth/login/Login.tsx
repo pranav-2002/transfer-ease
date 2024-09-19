@@ -21,6 +21,7 @@ export default function Login() {
   const router = useRouter();
   const { toast } = useToast();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
@@ -30,8 +31,9 @@ export default function Login() {
   const handleSignIn = async (e: any) => {
     e.preventDefault();
 
+    setIsLoading(true);
     const result = await signIn("credentials", loginData);
-
+    setIsLoading(false);
     if (result?.error) {
       toast({
         title: "Invalid Email or Password",
@@ -93,11 +95,8 @@ export default function Login() {
                   }
                 />
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 Login
-              </Button>
-              <Button variant="outline" className="w-full">
-                Login with Google
               </Button>
             </div>
           </form>

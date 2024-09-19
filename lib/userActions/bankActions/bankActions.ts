@@ -72,8 +72,8 @@ export const userBalanceDetails = async () => {
 
     if (accountDetails.length === 0) {
       return {
-        status: "Error",
-        message: "No accounts linked to the user",
+        status: "No Account",
+        message: "Please link bank account",
       };
     }
 

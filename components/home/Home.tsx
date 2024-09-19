@@ -11,9 +11,11 @@ import {
 } from "@/lib/userActions/bankActions/bankActions";
 import React, { useEffect, useMemo, useState } from "react";
 import { useToast } from "../ui/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { toast } = useToast();
+  const router = useRouter();
 
   interface accountData {
     id: number;
@@ -34,6 +36,13 @@ export default function Home() {
     const response = await userBalanceDetails();
     if (response.status === "Success" && response.data) {
       setAccountData(response.data);
+    } else if (response.status === "No Account") {
+      toast({
+        title: "Error",
+        description: response.message,
+        variant: "destructive",
+      });
+      router.push("/connect-bank");
     } else {
       toast({
         title: response.status,
@@ -47,6 +56,13 @@ export default function Home() {
     const response = await transactionDetails();
     if (response.status === "Success" && response.data) {
       setTransactionsData(response.data);
+    } else if (response.status === "No Account") {
+      toast({
+        title: "Error",
+        description: response.message,
+        variant: "destructive",
+      });
+      router.push("/connect-bank");
     } else {
       toast({
         title: response.status,

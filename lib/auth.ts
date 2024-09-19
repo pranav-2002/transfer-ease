@@ -1,6 +1,5 @@
 import prisma from "@/db";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
 import { compare } from "bcrypt-ts";
 
 export const authOptions = {
@@ -40,10 +39,6 @@ export const authOptions = {
           console.log(error);
         }
       },
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
   pages: {
